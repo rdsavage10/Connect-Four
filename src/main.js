@@ -13,6 +13,7 @@ let arrowButtons;
 let gameOver = false;
 let mousehovering = 0;
 
+
 function createButtons() {
   while (colDiv.childElementCount !== boardCol) {
     let i = colDiv.childElementCount;
@@ -38,11 +39,15 @@ function drawBoard(col, row) {
 }
 
 function drawSquare(x, y, color) {
+
   ctx.fillStyle = "#32557f";
   ctx.beginPath();
   ctx.arc(x*SQ + 0.5*SQ, y*SQ+ 0.5*SQ, 0.33*SQ, 0, 2 * Math.PI);
   ctx.rect(x*SQ + SQ, y*SQ, -SQ, SQ);
   ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#32557f";
+  ctx.stroke();
 }
 
 function drawPiece(x, y, color) {
