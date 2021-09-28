@@ -115,6 +115,7 @@ function drop(col) {
           gameOver = true;
 
         }
+        isAnimated = false;
         nextTurn();
         break;
       }
