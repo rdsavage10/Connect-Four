@@ -9,8 +9,9 @@ let p1Turn = true;
 let p1Color = "red";
 let p2Color = "yellow";
 let colDiv = document.getElementById("button-container");
-let isAnimated = false;
+let arrowButtons;
 let gameOver = false;
+let mousehovering = 0;
 
 function createButtons() {
   while (colDiv.childElementCount !== boardCol) {
@@ -19,12 +20,13 @@ function createButtons() {
       colDiv.lastChild.remove();
     } else if (i < boardCol) {
       colDiv.insertAdjacentHTML('beforeend',
-        `<button type="button" name="col-${i + 1}" class="arrow arrow-down" id="col-${i + 1}" onmouseover="drawPreview(${i + 1})" onmouseout="undrawPiece(${i}, 0)" onclick="drop(${i + 1})"></button>`
+        `<button type="button" name="col-${i + 1}" class="arrow" id="col-${i + 1}" value="${i + 1}"></button>`
       )
     } else {
       break;
     }
   }
+  arrowButtons = document.querySelectorAll(".arrow");
 }
 
 function drawBoard(col, row) {
@@ -95,30 +97,20 @@ function undrawPiece(x, y) {
 }
 
 function drop(col) {
-  if(!isAnimated) {
-    col--
-    let nextEmpty;
-    let color;
-    if (p1Turn === true) {
-      color = p1Color;
-    } else {
-      color = p2Color;
-    }
-    for (var i = board[col].length; i >= 0; i--) {
-      if (board[col][i] == VACANT) {
-        board[col][i] = color;
-        nextEmpty = i + 1;
-        isAnimated = true;
-        animatePiece(col, 0, color, nextEmpty)
-        if (winCheck(col, i, color)) {
-          alert(winCheck(col, i, color))
-          gameOver = true;
-
-        }
-        isAnimated = false;
-        nextTurn();
-        break;
-      }
+  col--
+  let nextEmpty;
+  let color;
+  if (p1Turn === true) {
+    color = p1Color;
+  } else {
+    color = p2Color;
+  }
+  for (var i = board[col].length; i >= 0; i--) {
+    if (board[col][i] == VACANT) {
+      board[col][i] = color;
+      nextEmpty = i + 1;
+      animatePiece(col, 0, color, nextEmpty)
+      break;
     }
   }
 }
@@ -133,6 +125,17 @@ function animatePiece(col, y, color, nextEmpty) {
       drawBoard(boardCol, boardRow);
       window.requestAnimationFrame(()=>{animatePiece(col, y + speed, color, nextEmpty)});
     } else {
+          arrowButtons.forEach(e => {e.disabled = false;});
+          if (winCheck(col, nextEmpty - 1, color)) {
+            alert(winCheck(col, nextEmpty - 1, color))
+            gameOver = true;
+          }
+          nextTurn();
+          arrowButtons.forEach(e => {
+            if (e.matches(":hover")) {
+              e.dispatchEvent(new MouseEvent('mouseover', { 'bubbles': true }));
+            }
+          });
     }
   }, 1000/60)
 
@@ -241,6 +244,38 @@ function newGame() {
     drawBoard(boardCol, boardRow)
 }
 
+colDiv.addEventListener("click", event => {
+    if (event.target.className !== "arrow") {
+      return;
+    }
+    if (event.target.disabled === false) {
+      drop(event.target.value);
+    }
+    arrowButtons.forEach(e => {e.disabled = true;});
+  }
+)
+
+colDiv.addEventListener("mouseover", event => {
+    if (event.target.className !== "arrow") {
+      return;
+    }
+    if (event.target.disabled === false) {
+      mousehovering = event.target.value;
+      drawPreview(event.target.value);
+    }
+  }
+)
+
+colDiv.addEventListener("mouseout", event => {
+    if (event.target.className !== "arrow") {
+      return;
+    }
+    mousehovering = 0;
+    if (event.target.disabled === false) {
+      undrawPiece(event.target.value - 1, 0);
+    }
+  }
+)
 
 
 
