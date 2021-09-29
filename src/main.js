@@ -103,7 +103,11 @@ function undrawPiece(x, y, canvas) {
   canvas.fillStyle = VACANT;
   canvas.strokeStyle = VACANT;
   canvas.beginPath();
-  canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.36*SQ, 0, 2 * Math.PI);
+  if (canvas == ctx2) {
+    canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.4*SQ, 0, 2 * Math.PI);
+  } else {
+    canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.34*SQ, 0, 2 * Math.PI);
+  }
   canvas.fill();
   canvas.stroke();
 }
