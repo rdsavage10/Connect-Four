@@ -2,6 +2,7 @@ let cvs = document.getElementById('canvas');
 let ctx = cvs.getContext('2d');
 let cvs2 = document.getElementById('canvas-2');
 let ctx2 = cvs2.getContext('2d');
+ctx2.scale(0.2, 0.2)
 let boardRow = 6;
 let boardCol = 7;
 const SQ = 100;
@@ -160,7 +161,7 @@ function menuAnimation() {
       board[c][r] = VACANT;
     }
   }
-  ctx2.scale(0.2, 0.2)
+  ctx2.clearRect(0, 0, cvs2.width * 5, cvs2.height * 5);
   drawBoard(boardCol, boardRow, ctx2);
   menuDrop()
 }
@@ -306,6 +307,7 @@ function newGame() {
   }
 
     createButtons();
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
     drawBoard(boardCol, boardRow, ctx)
 }
 

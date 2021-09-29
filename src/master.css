@@ -3,10 +3,8 @@
 }
 #canvas-2 {
   object-fit: contain;
-  /* border: 1px solid black; */
   position: relative;
-  margin: -15% auto 5% auto;
-  z-index: -1;
+  margin: -285px auto 100px auto;
 }
 
 #game {
@@ -20,7 +18,20 @@ display: none;
   font-family: sans-serif;
   justify-content: center;
   align-content: center;
-  border: 1px solid black;
+  /* border: 1px solid black; */
+}
+
+.title {
+  z-index: +1;
+}
+
+.menu-button {
+  display: flex;
+  max-width: 50%;
+  justify-content: center;
+  margin: 10px auto;
+  padding: 20px 40px;
+  /* margin: 5%; */
 }
 
 #menu-button-container {
@@ -33,15 +44,6 @@ display: none;
   justify-content: center;
   display: flex;
   margin-top: 20px;
-}
-
-.menu-button {
-  display: flex;
-  max-width: 50%;
-  justify-content: center;
-  margin: 10px auto;
-  padding: 20px 40px;
-  /* margin: 5%; */
 }
 
 .row {
