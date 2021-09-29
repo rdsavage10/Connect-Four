@@ -6,11 +6,25 @@
     <title>Connect Four</title>
   </head>
   <body>
-    <div class="main column">
+    <div id="menu" class="column">
+      <h1 class="row">
+        Connect Four
+      </h1>
+      <canvas id="canvas-2" width="140" height="140"></canvas>
+      <div class="row" id="menu-button-container">
+        <button type="button" name="button" class="menu-button" onclick="newGame()">Start</button>
+        <button type="button" name="button" class="menu-button">Options</button>
+      </div>
+    </div>
+
+    <div id="game" class="column">
       <div id="button-container" class="row">
       </div>
       <div class="row">
         <canvas id="canvas" width="700" height="700"></canvas>
+      </div>
+      <div class="quit">
+        <button type="button" name="quit" onclick="quit()">Quit to menu</button>
       </div>
     </div>
 

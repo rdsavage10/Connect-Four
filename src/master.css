@@ -1,10 +1,47 @@
 #canvas {
   object-fit: contain;
 }
+#canvas-2 {
+  object-fit: contain;
+  /* border: 1px solid black; */
+  position: relative;
+  margin: -15% auto 5% auto;
+  z-index: -1;
+}
 
-.main {
-display: flex;
+#game {
+display: none;
+}
 
+#menu {
+  margin: auto;
+  padding: 5%;
+  font-size: 3em;
+  font-family: sans-serif;
+  justify-content: center;
+  align-content: center;
+  border: 1px solid black;
+}
+
+#menu-button-container {
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+.quit {
+  justify-content: center;
+  display: flex;
+  margin-top: 20px;
+}
+
+.menu-button {
+  display: flex;
+  max-width: 50%;
+  justify-content: center;
+  margin: 10px auto;
+  padding: 20px 40px;
+  /* margin: 5%; */
 }
 
 .row {
