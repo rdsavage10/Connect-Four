@@ -37,14 +37,6 @@ function createButtons() {
   arrowButtons = document.querySelectorAll(".arrow");
 }
 
-function drawBoard(col, row, canvas) {
-  for (let c = 0; c < col; c++) {
-    for (let r = 0; r < row; r++) {
-      drawSquare(c, r + 1, board[c][r], canvas);
-    }
-  }
-}
-
 function drawSquare(x, y, color, canvas) {
   canvas.fillStyle = "#32557f";
   canvas.beginPath();
@@ -54,6 +46,14 @@ function drawSquare(x, y, color, canvas) {
   canvas.lineWidth = 2;
   canvas.strokeStyle = "#32557f";
   canvas.stroke();
+}
+
+function drawBoard(col, row, canvas) {
+  for (let c = 0; c < col; c++) {
+    for (let r = 0; r < row; r++) {
+      drawSquare(c, r + 1, board[c][r], canvas);
+    }
+  }
 }
 
 function drawPiece(x, y, color, canvas) {
@@ -70,6 +70,20 @@ function drawPiece(x, y, color, canvas) {
   canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.15*SQ, 0, 2 * Math.PI);
   canvas.stroke();
   canvas.closePath()
+}
+
+function undrawPiece(x, y, canvas) {
+  canvas.lineWidth = 2;
+  canvas.fillStyle = VACANT;
+  canvas.strokeStyle = VACANT;
+  canvas.beginPath();
+  if (canvas == ctx2) {
+    canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.4*SQ, 0, 2 * Math.PI);
+  } else {
+    canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.34*SQ, 0, 2 * Math.PI);
+  }
+  canvas.fill();
+  canvas.stroke();
 }
 
 function drawPreview(x) {
@@ -96,20 +110,6 @@ function drawPreview(x) {
     ctx.stroke();
     ctx.closePath()
   }
-}
-
-function undrawPiece(x, y, canvas) {
-  canvas.lineWidth = 2;
-  canvas.fillStyle = VACANT;
-  canvas.strokeStyle = VACANT;
-  canvas.beginPath();
-  if (canvas == ctx2) {
-    canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.4*SQ, 0, 2 * Math.PI);
-  } else {
-    canvas.arc(x*SQ + 0.5*SQ, y*SQ + 0.5*SQ, 0.34*SQ, 0, 2 * Math.PI);
-  }
-  canvas.fill();
-  canvas.stroke();
 }
 
 function drop(col) {
@@ -157,19 +157,6 @@ function animatePiece(col, y, color, nextEmpty) {
 
 }
 
-function menuAnimation() {
-  board = [];
-  for (let c = 0; c < boardCol; c++) {
-    board[c] = [];
-    for (let r = 0; r < boardRow; r++) {
-      board[c][r] = VACANT;
-    }
-  }
-  ctx2.clearRect(0, 0, cvs2.width * 5, cvs2.height * 5);
-  drawBoard(boardCol, boardRow, ctx2);
-  menuDrop()
-}
-
 function menuDrop() {
   let col = Math.floor(Math.random() * boardCol);
   let nextEmpty;
@@ -189,9 +176,22 @@ function menuDrop() {
   }
 }
 
+function menuAnimation() {
+  board = [];
+  for (let c = 0; c < boardCol; c++) {
+    board[c] = [];
+    for (let r = 0; r < boardRow; r++) {
+      board[c][r] = VACANT;
+    }
+  }
+  ctx2.clearRect(0, 0, cvs2.width * 5, cvs2.height * 5);
+  drawBoard(boardCol, boardRow, ctx2);
+  menuDrop()
+}
+
 function menuAnimatePiece(col, y, color, nextEmpty) {
   setTimeout(function(){
-    let speed = 1/5;
+    let speed = 1/10;
     y = Math.floor(y*100)/100;
     if(y <= boardRow && y <= nextEmpty) {
       undrawPiece(col, y - speed, ctx2)
@@ -202,7 +202,9 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
           nextTurn();
           if (menu) {
             setTimeout(function() {
-              menuDrop();
+              if (menu) {
+                menuDrop();
+              }
             }, 1000/5)
           }
     }
@@ -211,10 +213,20 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
 }
 
 function nextTurn() {
-  if (p1Turn) {
-    p1Turn = false;
+  if (menu) {
+    if (p1Turn) {
+      p1Turn = false;
+    } else {
+      p1Turn = true;
+    }
   } else {
-    p1Turn = true;
+    if (p1Turn) {
+      p1Turn = false;
+      arrowButtons.forEach(e => {e.style.setProperty("--button-color", p2Color)})
+    } else {
+      p1Turn = true;
+      arrowButtons.forEach(e => {e.style.setProperty("--button-color", p1Color)})
+    }
   }
 }
 
@@ -291,9 +303,6 @@ function winCheck(col, row, color) {
   }
 }
 
-
-
-
 function newGame() {
   if (menu) {
     gameDiv.style.display = "flex";
@@ -323,38 +332,34 @@ function quit() {
 }
 
 colDiv.addEventListener("click", event => {
-    if (event.target.className !== "arrow") {
-      return;
-    }
-    if (event.target.disabled === false) {
-      drop(event.target.value);
-    }
-    arrowButtons.forEach(e => {e.disabled = true;});
+  if (event.target.className !== "arrow") {
+    return;
   }
-)
+  if (event.target.disabled === false) {
+    drop(event.target.value);
+  }
+  arrowButtons.forEach(e => {e.disabled = true;});
+})
 
 colDiv.addEventListener("mouseover", event => {
-    if (event.target.className !== "arrow") {
-      return;
-    }
-    if (event.target.disabled === false) {
-      mousehovering = event.target.value;
-      drawPreview(event.target.value);
-    }
+  if (event.target.className !== "arrow") {
+    return;
   }
-)
+  if (event.target.disabled === false) {
+    mousehovering = event.target.value;
+    drawPreview(event.target.value);
+  }
+})
 
 colDiv.addEventListener("mouseout", event => {
-    if (event.target.className !== "arrow") {
-      return;
-    }
-    mousehovering = 0;
-    if (event.target.disabled === false) {
-      undrawPiece(event.target.value - 1, 0, ctx);
-    }
+  if (event.target.className !== "arrow") {
+    return;
   }
-)
+  mousehovering = 0;
+  if (event.target.disabled === false) {
+    undrawPiece(event.target.value - 1, 0, ctx);
+  }
+})
 
-
-//Title icon
+//Run Title Screen Animation
 menuAnimation();

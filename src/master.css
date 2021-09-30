@@ -1,3 +1,12 @@
+/* body {
+  background: grey;
+} */
+
+:root {
+  --button-color: red;
+}
+
+
 #canvas {
   object-fit: contain;
 }
@@ -12,7 +21,7 @@ display: none;
 }
 
 #menu {
-  margin: auto;
+  margin: 5rem auto auto auto;
   padding: 5%;
   font-size: 3em;
   font-family: sans-serif;
@@ -26,12 +35,24 @@ display: none;
 }
 
 .menu-button {
-  display: flex;
-  max-width: 50%;
-  justify-content: center;
-  margin: 10px auto;
-  padding: 20px 40px;
-  /* margin: 5%; */
+  background-color: #1a131373;
+  border-radius: 1rem;
+  border: 3px solid #cecece;
+  font-size: 1.5rem;
+  padding: 1.5rem 5rem;
+  margin: 0.25rem auto;
+  cursor: pointer;
+  color: #fff;
+}
+
+.menu-button:hover {
+  border: 4px solid #ff4b4b;
+  /* border-radius: 10px; */
+}
+
+.menu-button:focus {
+  border: 4px inset #ff4b4b;
+
 }
 
 #menu-button-container {
@@ -60,7 +81,8 @@ display: none;
 .arrow {
   width: 35px;
   height: 35px;
-  border: 4px solid #32557f;
+  /* border: 4px solid #32557f; */
+  border: 4px solid var(--button-color);
   border-left: 0;
   border-top: 0;
   background: transparent;
@@ -79,7 +101,7 @@ display: none;
 .arrow:disabled {
   width: 35px;
   height: 35px;
-  border: 4px solid grey;
+  border-color: grey;
   border-left: 0;
   border-top: 0;
   background: transparent;
