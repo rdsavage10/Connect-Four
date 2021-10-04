@@ -9,6 +9,7 @@ const SQ = 100;
 const VACANT = 'white';
 let board = [];
 let board2 = [];
+let menuP1Turn = true;
 let p1Turn = true;
 let p1Color = "red";
 let p2Color = "yellow";
@@ -52,6 +53,14 @@ function drawBoard(col, row, canvas) {
   for (let c = 0; c < col; c++) {
     for (let r = 0; r < row; r++) {
       drawSquare(c, r + 1, board[c][r], canvas);
+    }
+  }
+}
+
+function menuDrawBoard(col, row, canvas) {
+  for (let c = 0; c < col; c++) {
+    for (let r = 0; r < row; r++) {
+      drawSquare(c, r + 1, board2[c][r], canvas);
     }
   }
 }
@@ -157,36 +166,36 @@ function animatePiece(col, y, color, nextEmpty) {
 
 }
 
+function menuAnimation() {
+  board2 = [];
+  for (let c = 0; c < boardCol; c++) {
+    board2[c] = [];
+    for (let r = 0; r < boardRow; r++) {
+      board2[c][r] = VACANT;
+    }
+  }
+  ctx2.clearRect(0, 0, cvs2.width * 5, cvs2.height * 5);
+  menuDrawBoard(boardCol, boardRow, ctx2);
+  menuDrop()
+}
+
 function menuDrop() {
   let col = Math.floor(Math.random() * boardCol);
   let nextEmpty;
   let color;
-  if (p1Turn === true) {
+  if (menuP1Turn === true) {
     color = p1Color;
   } else {
     color = p2Color;
   }
-  for (var i = board[col].length; i >= 0; i--) {
-    if (board[col][i] == VACANT) {
-      board[col][i] = color;
+  for (var i = board2[col].length; i >= 0; i--) {
+    if (board2[col][i] == VACANT) {
+      board2[col][i] = color;
       nextEmpty = i + 1;
       menuAnimatePiece(col, 0, color, nextEmpty)
       break;
     }
   }
-}
-
-function menuAnimation() {
-  board = [];
-  for (let c = 0; c < boardCol; c++) {
-    board[c] = [];
-    for (let r = 0; r < boardRow; r++) {
-      board[c][r] = VACANT;
-    }
-  }
-  ctx2.clearRect(0, 0, cvs2.width * 5, cvs2.height * 5);
-  drawBoard(boardCol, boardRow, ctx2);
-  menuDrop()
 }
 
 function menuAnimatePiece(col, y, color, nextEmpty) {
@@ -196,7 +205,7 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
     if(y <= boardRow && y <= nextEmpty) {
       undrawPiece(col, y - speed, ctx2)
       drawPiece(col, y, color, ctx2);
-      drawBoard(boardCol, boardRow, ctx2);
+      menuDrawBoard(boardCol, boardRow, ctx2);
       window.requestAnimationFrame(()=>{menuAnimatePiece(col, y + speed, color, nextEmpty)});
     } else {
           nextTurn();
@@ -214,10 +223,10 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
 
 function nextTurn() {
   if (menu) {
-    if (p1Turn) {
-      p1Turn = false;
+    if (menuP1Turn) {
+      menuP1Turn = false;
     } else {
-      p1Turn = true;
+      menuP1Turn = true;
     }
   } else {
     if (p1Turn) {
@@ -318,7 +327,7 @@ function newGame() {
       board[c][r] = VACANT;
     }
   }
-
+  debugger
     createButtons();
     ctx.clearRect(0, 0, cvs.width, cvs.height);
     drawBoard(boardCol, boardRow, ctx)

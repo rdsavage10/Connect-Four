@@ -78,6 +78,13 @@ display: none;
   flex-flow: column;
 }
 
+#button-container {
+  margin: auto;
+  background: #32557f;
+  border: 3px solid black;
+  border-radius: 5rem;
+}
+
 .arrow {
   width: 35px;
   height: 35px;
@@ -89,13 +96,13 @@ display: none;
   transform: rotate(45deg);
   display: flex;
   justify-content: space-around;
-  margin: 30px 32px;
+  margin: 20px 32px 30px 32px;
 }
 
 .arrow:hover {
   width: 40px;
   height: 40px;
-  margin: 25px 29.5px;
+  margin: 15px 29.5px 20px 29.5px;
 
 }
 .arrow:disabled {
@@ -108,5 +115,5 @@ display: none;
   transform: rotate(45deg);
   display: flex;
   justify-content: space-around;
-  margin: 30px 32px;
+  margin: 20px 32px 30px 32px;
 }
