@@ -12,9 +12,16 @@
       </h1>
       <canvas id="canvas-2" width="140" height="140"></canvas>
       <div class="row" id="menu-button-container">
-        <button id="start" type="button" name="button" class="menu-button" onclick="newGame()">Start</button>
-        <button type="button" name="button" class="menu-button" style="display:none">Options</button>
+        <button id="resume" type="button" name="button" class="menu-button" onclick="resume()" style="display:none">Resume</button>
+        <button id="start" type="button" name="button" class="menu-button" onclick="newGame()">New Game</button>
+        <button type="button" name="button" class="menu-button" onclick="options.show()">Options</button>
       </div>
+    </div>
+
+    <div id="options" style="display:none">
+      <h3>Options</h3>
+      <button id="optionAnimation" type="button" name="button" class="option-button" onclick="options.toggleAnimations()">Animations: ON</button>
+      <button type="button" name="button" class="option-button" onclick="options.hide()">back</button>
     </div>
 
     <div id="game" class="column">
@@ -24,7 +31,7 @@
         <canvas id="canvas" width="700" height="700"></canvas>
       </div>
       <div class="quit">
-        <button type="button" name="quit" onclick="quit()">Quit to menu</button>
+        <button type="button" class="option-button" name="quit" onclick="quit()">Quit to menu</button>
       </div>
     </div>
 

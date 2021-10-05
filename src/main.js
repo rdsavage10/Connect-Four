@@ -16,10 +16,15 @@ let p2Color = "yellow";
 let colDiv = document.getElementById("button-container");
 let menuDiv = document.getElementById("menu");
 let gameDiv = document.getElementById("game");
+let optionDiv = document.getElementById("options");
+let resumeBtn = document.getElementById('resume');
 let arrowButtons;
 let gameOver = false;
 let mousehovering = 0;
 let menu = true;
+let winner;
+let showAnimations = true;
+// let openCols = []
 
 
 function createButtons() {
@@ -28,14 +33,14 @@ function createButtons() {
     if (i > boardCol) {
       colDiv.lastChild.remove();
     } else if (i < boardCol) {
-      colDiv.insertAdjacentHTML('beforeend',
-        `<button type="button" name="col-${i + 1}" class="arrow" id="col-${i + 1}" value="${i + 1}"></button>`
-      )
+      colDiv.insertAdjacentHTML('beforeend', `<button type="button" name="col-${i + 1}" class="arrow" id="col-${i + 1}" value="${i + 1}"></button>`)
+      // openCols[i] = true;
     } else {
       break;
     }
   }
   arrowButtons = document.querySelectorAll(".arrow");
+  arrowButtons.forEach(e => {e.disabled = false;});
 }
 
 function drawSquare(x, y, color, canvas) {
@@ -138,6 +143,41 @@ function drop(col) {
       break;
     }
   }
+
+}
+
+function fastDrop(col) {
+  col--
+  let nextEmpty;
+  let color;
+  if (p1Turn === true) {
+    color = p1Color;
+  } else {
+    color = p2Color;
+  }
+  for (var i = board[col].length; i >= 0; i--) {
+    if (board[col][i] == VACANT) {
+      board[col][i] = color;
+      nextEmpty = i + 1;
+      drawPiece(col, i + 1, color, ctx);
+      drawBoard(boardCol, boardRow, ctx);
+      if (winCheck(col, i, color)) {
+        gameOver = true;
+        win()
+      } else {
+
+        arrowButtons.forEach(e => {e.disabled = false;});
+      }
+      nextTurn();
+      arrowButtons.forEach(e => {
+        if (e.matches(":hover")) {
+          e.dispatchEvent(new MouseEvent('mouseover', { 'bubbles': true }));
+        }
+      });
+      break;
+    }
+  }
+
 }
 
 function animatePiece(col, y, color, nextEmpty) {
@@ -150,17 +190,19 @@ function animatePiece(col, y, color, nextEmpty) {
       drawBoard(boardCol, boardRow, ctx);
       window.requestAnimationFrame(()=>{animatePiece(col, y + speed, color, nextEmpty)});
     } else {
-          arrowButtons.forEach(e => {e.disabled = false;});
-          if (winCheck(col, nextEmpty - 1, color)) {
-            alert(winCheck(col, nextEmpty - 1, color))
-            gameOver = true;
-          }
-          nextTurn();
-          arrowButtons.forEach(e => {
-            if (e.matches(":hover")) {
-              e.dispatchEvent(new MouseEvent('mouseover', { 'bubbles': true }));
-            }
-          });
+      if (winCheck(col, nextEmpty - 1, color)) {
+        // alert(winCheck(col, nextEmpty - 1, color))
+        win()
+      } else {
+        gameOver = true;
+        arrowButtons.forEach(e => {e.disabled = false;});
+      }
+      nextTurn();
+      arrowButtons.forEach(e => {
+        if (e.matches(":hover")) {
+          e.dispatchEvent(new MouseEvent('mouseover', { 'bubbles': true }));
+        }
+      });
     }
   }, 1000/60)
 
@@ -208,7 +250,7 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
       menuDrawBoard(boardCol, boardRow, ctx2);
       window.requestAnimationFrame(()=>{menuAnimatePiece(col, y + speed, color, nextEmpty)});
     } else {
-          nextTurn();
+          menuNextTurn();
           if (menu) {
             setTimeout(function() {
               if (menu) {
@@ -222,20 +264,19 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
 }
 
 function nextTurn() {
-  if (menu) {
-    if (menuP1Turn) {
-      menuP1Turn = false;
-    } else {
-      menuP1Turn = true;
-    }
+  if (p1Turn) {
+    p1Turn = false;
+    arrowButtons.forEach(e => {e.style.setProperty("--button-color", p2Color)})
   } else {
-    if (p1Turn) {
-      p1Turn = false;
-      arrowButtons.forEach(e => {e.style.setProperty("--button-color", p2Color)})
-    } else {
-      p1Turn = true;
-      arrowButtons.forEach(e => {e.style.setProperty("--button-color", p1Color)})
-    }
+    p1Turn = true;
+    arrowButtons.forEach(e => {e.style.setProperty("--button-color", p1Color)})
+  }
+}
+function menuNextTurn() {
+  if (menuP1Turn) {
+    menuP1Turn = false;
+  } else {
+    menuP1Turn = true;
   }
 }
 
@@ -312,6 +353,26 @@ function winCheck(col, row, color) {
   }
 }
 
+function win() {
+  winner = p1Turn ? p1Color : p2Color;
+  let winMessage = winner.charAt(0).toUpperCase() + winner.slice(1) + " Wins!";
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  // ctx.arc(x*SQ + 0.5*SQ, y*SQ+ 0.5*SQ, 0.33*SQ, 0, 2 * Math.PI);
+  // ctx.rect(1*SQ + SQ, 3*SQ, 3*SQ, 1*SQ);
+  ctx.fill();
+  ctx.fillStyle = winner;
+  ctx.font = "70px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(winMessage, cvs.width/2, 4*SQ);
+  ctx.strokeStyle = ""
+    ctx.font = "70px Arial";
+  ctx.strokeText(winMessage, cvs.width/2, 4*SQ);
+  // canvas.lineWidth = 2;
+  // canvas.strokeStyle = "#32557f";
+  // canvas.stroke();
+}
+
 function newGame() {
   if (menu) {
     gameDiv.style.display = "flex";
@@ -319,7 +380,9 @@ function newGame() {
     menu = false;
   }
   gameOver = false;
-  p1Turn = true;
+  if (!p1Turn) {
+    nextTurn();
+  }
   board = [];
   for (let c = 0; c < boardCol; c++) {
     board[c] = [];
@@ -327,7 +390,6 @@ function newGame() {
       board[c][r] = VACANT;
     }
   }
-  debugger
     createButtons();
     ctx.clearRect(0, 0, cvs.width, cvs.height);
     drawBoard(boardCol, boardRow, ctx)
@@ -337,17 +399,66 @@ function quit() {
   gameDiv.style.display = "none";
   menuDiv.style.display = "flex";
   menu = true;
+  if (gameOver) {
+    resumeBtn.style.display = "none";
+  } else {
+    resumeBtn.style.display = "inline";
+  }
   menuAnimation();
 }
+
+function resume() {
+  gameDiv.style.display = "flex";
+  menuDiv.style.display = "none";
+  menu = false;
+}
+
+function gameSelect() {
+
+}
+
+const options = {
+  show: function() {
+    gameDiv.style.display = "none";
+    menuDiv.style.display = "none";
+    optionDiv.style.display = "flex";
+  },
+
+  hide: function() {
+    gameDiv.style.display = "none";
+    menuDiv.style.display = "flex";
+    optionDiv.style.display = "none";
+  },
+
+  toggleAnimations: function() {
+    if (document.getElementById('optionAnimation').innerText === "Animations: ON") {
+      showAnimations = false;
+      document.getElementById('optionAnimation').innerText = "Animations: OFF";
+    } else {
+      showAnimations = true;
+      document.getElementById('optionAnimation').innerText = "Animations: ON"
+    }
+  }
+}
+
+// optionDiv.addEventListener("click", event => {
+//   if (event.target.className !== "option-button") {
+//     return;
+//   }
+// });
 
 colDiv.addEventListener("click", event => {
   if (event.target.className !== "arrow") {
     return;
   }
   if (event.target.disabled === false) {
-    drop(event.target.value);
+    arrowButtons.forEach(e => {e.disabled = true;});
+    if (showAnimations) {
+      drop(event.target.value);
+    } else {
+      fastDrop(event.target.value);
+    }
   }
-  arrowButtons.forEach(e => {e.disabled = true;});
 })
 
 colDiv.addEventListener("mouseover", event => {
@@ -372,3 +483,5 @@ colDiv.addEventListener("mouseout", event => {
 
 //Run Title Screen Animation
 menuAnimation();
+// newGame();
+// win();
