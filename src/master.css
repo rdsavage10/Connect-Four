@@ -54,17 +54,6 @@ display: none;
   box-shadow:inset 0 -0.6em 0 -0.35em rgba(0,0,0,0.17);
 }
 
-.option-button:hover {
-  text-shadow: 0 0 2em rgba(255,255,255,1);
-  /* color: #ff4b4b; */
-  border: 3px solid #ff4b4b;
-}
-
-.option-button:active {
-  color:#BBBBBB;
-  border-color:#BBBBBB;
-}
-
 
 .title {
   z-index: +1;
@@ -82,14 +71,37 @@ display: none;
   color: #fff;
 }
 
-.menu-button:hover {
+.game-select-button {
+  background-color: #1a131373;
+  border-radius: 1em;
+  border: 3px solid #cecece;
+  font-size: 1.5rem;
+  /* width: 100%; */
+  padding: 1em;
+  margin: 10%;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+}
+
+
+.menu-button:hover, .option-button:hover, .game-select-button:hover {
+  text-shadow: 0 0 2em rgba(255,255,255,1);
   border: 3px solid #ff4b4b;
   /* border-radius: 10px; */
 }
 
-.menu-button:active {
+.menu-button:active, .option-button:active, .game-select-button:active {
   color:#BBBBBB;
   border-color:#BBBBBB;
+}
+
+#gameSelectDiv {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* width: 100vw;
+  height: 100vh; */
 }
 
 #menu-button-container {
@@ -106,7 +118,7 @@ display: none;
 
 .row {
   display: flex;
-  flex-flow: row;
+  flex-flow: row ;
   justify-content: center;
 }
 
@@ -153,4 +165,70 @@ display: none;
   display: flex;
   justify-content: space-around;
   margin: 20px 32px 30px 32px;
+}
+
+.diamond-shield-1 {
+  width: 0;
+  height: 0;
+  border: 50px solid transparent;
+  border-bottom: 20px solid red;
+  position: relative;
+  top: -75px;
+  margin: auto auto 10px;
+}
+
+.diamond-shield-1:after {
+  content: '';
+  position: absolute;
+  left: -50px;
+  top: 20px;
+  width: 0;
+  height: 0;
+  border: 50px solid transparent;
+  border-top: 70px solid red;
+}
+
+.diamond-shield-2 {
+  width: 0;
+  height: 0;
+  border: 50px solid transparent;
+  border-bottom: 20px solid yellow;
+  position: relative;
+  top: -75px;
+  margin: auto auto 10px;
+}
+
+.diamond-shield-2:after {
+  content: '';
+  position: absolute;
+  left: -50px;
+  top: 20px;
+  width: 0;
+  height: 0;
+  border: 50px solid transparent;
+  border-top: 70px solid yellow;
+}
+
+.egg {
+  display: block;
+  width: 126px;
+  height: 180px;
+  background-color: red;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+.circle-1 {
+  margin: auto auto 18px;
+  width: 50px;
+  height: 50px;
+  background: red;
+  border-radius: 50%
+}
+
+.circle-2 {
+  margin: auto auto 18px;
+  width: 50px;
+  height: 50px;
+  background: yellow;
+  border-radius: 50%
 }

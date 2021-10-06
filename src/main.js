@@ -17,6 +17,7 @@ let colDiv = document.getElementById("button-container");
 let menuDiv = document.getElementById("menu");
 let gameDiv = document.getElementById("game");
 let optionDiv = document.getElementById("options");
+let gameSelectDiv = document.getElementById("gameSelectDiv");
 let resumeBtn = document.getElementById('resume');
 let arrowButtons;
 let gameOver = false;
@@ -380,6 +381,7 @@ function newGame() {
   if (menu) {
     gameDiv.style.display = "flex";
     menuDiv.style.display = "none";
+    gameSelectDiv.style.display = "none";
     menu = false;
   }
   gameOver = false;
@@ -416,19 +418,13 @@ function resume() {
   menu = false;
 }
 
-function gameSelect() {
-
-}
-
 const options = {
   show: function() {
-    gameDiv.style.display = "none";
     menuDiv.style.display = "none";
     optionDiv.style.display = "flex";
   },
 
   hide: function() {
-    gameDiv.style.display = "none";
     menuDiv.style.display = "flex";
     optionDiv.style.display = "none";
   },
@@ -442,6 +438,20 @@ const options = {
       document.getElementById('optionAnimation').innerText = "Animations: ON"
     }
   }
+}
+
+const gameSelect = {
+  show: function() {
+    menuDiv.style.display = "none";
+    gameSelectDiv.style.display = "flex";
+  },
+
+  hide: function() {
+    menuDiv.style.display = "flex";
+    gameSelectDiv.style.display = "none";
+  }
+
+
 }
 
 // optionDiv.addEventListener("click", event => {
@@ -489,7 +499,7 @@ colDiv.addEventListener("mouseout", event => {
 menuAnimation();
 
 // testing area
-
+  // gameSelect.show();
 // const clickE = new Event("click", {"bubbles":true});
 // options.toggleAnimations()
 // newGame();

@@ -13,7 +13,7 @@
       <canvas id="canvas-2" width="140" height="140"></canvas>
       <div class="row" id="menu-button-container">
         <button id="resume" type="button" name="button" class="menu-button" onclick="resume()" style="display:none">Resume</button>
-        <button id="start" type="button" name="button" class="menu-button" onclick="newGame()">New Game</button>
+        <button id="start" type="button" name="button" class="menu-button" onclick="gameSelect.show()">New Game</button>
         <button type="button" name="button" class="menu-button" onclick="options.show()">Options</button>
       </div>
     </div>
@@ -22,6 +22,31 @@
       <h3>Options</h3>
       <button id="optionAnimation" type="button" name="button" class="option-button" onclick="options.toggleAnimations()">Animations: ON</button>
       <button type="button" name="button" class="option-button" onclick="options.hide()">back</button>
+    </div>
+
+    <div id="gameSelectDiv" style="display:none">
+      <div class="row">
+        <div class="game-select-button" onclick="newGame()">
+          <div class="row">
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+          </div>
+          <div class="row">
+            <div class="diamond-shield-1"></div>
+            <div class="diamond-shield-2"></div>
+          </div>
+            Two Players
+        </div>
+
+        <div class="game-select-button">
+          <div class="circle-1"></div>
+          <div class="diamond-shield-1"></div>
+            VS Computer
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" name="button" class="option-button" onclick="gameSelect.hide()">back</button>
+      </div>
     </div>
 
     <div id="game" class="column">
