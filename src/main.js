@@ -24,8 +24,6 @@ let mousehovering = 0;
 let menu = true;
 let winner;
 let showAnimations = true;
-// let openCols = []
-
 
 function createButtons() {
   while (colDiv.childElementCount !== boardCol) {
@@ -34,7 +32,6 @@ function createButtons() {
       colDiv.lastChild.remove();
     } else if (i < boardCol) {
       colDiv.insertAdjacentHTML('beforeend', `<button type="button" name="col-${i + 1}" class="arrow" id="col-${i + 1}" value="${i + 1}"></button>`)
-      // openCols[i] = true;
     } else {
       break;
     }
@@ -166,11 +163,15 @@ function fastDrop(col) {
         win()
       } else {
 
-        arrowButtons.forEach(e => {e.disabled = false;});
+        arrowButtons.forEach((e, i) => {
+          if (board[i][0] === VACANT) {
+            e.disabled = false;
+          }
+        });
       }
       nextTurn();
       arrowButtons.forEach(e => {
-        if (e.matches(":hover")) {
+        if (e.matches(":hover") && e.disabled === false) {
           e.dispatchEvent(new MouseEvent('mouseover', { 'bubbles': true }));
         }
       });
@@ -199,8 +200,10 @@ function animatePiece(col, y, color, nextEmpty) {
       }
       nextTurn();
       arrowButtons.forEach(e => {
-        if (e.matches(":hover")) {
+        if (e.matches(":hover") && e.disabled === false) {
           e.dispatchEvent(new MouseEvent('mouseover', { 'bubbles': true }));
+        } else {
+          e.dispatchEvent(new MouseEvent('mouseout', { 'bubbles': true }));
         }
       });
     }
@@ -453,6 +456,7 @@ colDiv.addEventListener("click", event => {
   }
   if (event.target.disabled === false) {
     arrowButtons.forEach(e => {e.disabled = true;});
+    undrawPiece(event.target.value - 1, 0, ctx);
     if (showAnimations) {
       drop(event.target.value);
     } else {
@@ -483,5 +487,24 @@ colDiv.addEventListener("mouseout", event => {
 
 //Run Title Screen Animation
 menuAnimation();
+
+// testing area
+
+// const clickE = new Event("click", {"bubbles":true});
+// options.toggleAnimations()
 // newGame();
+// for (var j = 0; j < 6; j++) {
+//   if (j % 2 === 0) {
+//     for (let i = 1; i < 8; i++) {
+//       // fastDrop(1);
+//       document.getElementById("col-" + i).dispatchEvent(clickE);
+//     }
+//   } else {
+//     for (let i = 7; i > 0; i--) {
+//       // fastDrop(1);
+//       document.getElementById("col-" + i).dispatchEvent(clickE);
+//     }
+//   }
+// }
+// document.getElementById("col-" + 1).dispatchEvent(clickE);
 // win();

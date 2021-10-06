@@ -18,21 +18,28 @@ const clickE = new Event("click", {"bubbles":true});
 //     assert.ok(menu, "menu active")
 // });
 //
-// QUnit.test('game', (assert) => {
-//     document.getElementById("start").dispatchEvent(clickE);
-//     assert.ok(!menu, "game active");
-//
-//     let boardState = [ [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ] ];
-//     assert.deepEqual(board, boardState, "blank board");
-//     document.getElementById("col-" + 1).dispatchEvent(clickE);
-//     boardState[0][5] = "red";
-//     assert.deepEqual(board, boardState, "board");
-//     boardState[0][4] = "red";
-//     boardState[0][3] = "red";
-//     setTimeout(() => { document.getElementById("col-" + 2).dispatchEvent(clickE); }, 2000);
-//
-//
-// });
+QUnit.test('game', (assert) => {
+    options.toggleAnimations()
+    newGame();
+    for (var i = 0; i < 6; i++) {
+    fastDrop(1);
+    }
+    document.getElementById("col-" + 1).dispatchEvent(clickE);
+
+    // document.getElementById("start").dispatchEvent(clickE);
+    // assert.ok(!menu, "game active");
+    //
+    // let boardState = [ [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ], [ "white", "white", "white", "white", "white", "white" ] ];
+    // assert.deepEqual(board, boardState, "blank board");
+    // document.getElementById("col-" + 1).dispatchEvent(clickE);
+    // boardState[0][5] = "red";
+    // assert.deepEqual(board, boardState, "board");
+    // boardState[0][4] = "red";
+    // boardState[0][3] = "red";
+    // setTimeout(() => { document.getElementById("col-" + 2).dispatchEvent(clickE); }, 2000);
+
+
+});
 
 
 // QUnit.test.todo('drawBoard', (assert) => {
