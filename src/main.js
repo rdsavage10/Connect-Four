@@ -499,7 +499,7 @@ colDiv.addEventListener("mouseout", event => {
 menuAnimation();
 
 // testing area
-  // gameSelect.show();
+  gameSelect.show();
 // const clickE = new Event("click", {"bubbles":true});
 // options.toggleAnimations()
 // newGame();
