@@ -328,6 +328,8 @@ function computerTurn(difficulty) {
 
 function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, beta = Number.POSITIVE_INFINITY, maxPlayer = true, lastMove = false) {
 
+  functionCalls++
+
   // get deep copy of nested array (need to replace array later because this is slow)
   gameBoard = JSON.parse(JSON.stringify(gameBoard));
 
@@ -362,7 +364,7 @@ function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, bet
       return [false, (-1 * (22 - ( game.p2Turns + depth)))];
     } else if(possibleMoves.length === 0) {
       return [false, 0];
-    } else {
+    } else if(depth === searchDepth){
       return [false, 0];
     }
   }
