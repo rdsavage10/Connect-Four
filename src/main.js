@@ -3,8 +3,6 @@ let ctx = cvs.getContext('2d');
 let cvs2 = document.getElementById('canvas-2');
 let ctx2 = cvs2.getContext('2d');
 ctx2.scale(0.2, 0.2)
-let boardRow = 6;
-let boardCol = 7;
 const SQ = 100;
 const VACANT = 'white';
 let board = [];
@@ -28,31 +26,29 @@ let winner;
 let showAnimations = true;
 let difficulty = "hard"
 let functionCalls = 0;
-let searchDepth = 4;
-let counter = [0,0];
+let searchDepth = 8;
 
 let game = {
-  boardRow: 6,
-  boardCol: 7,
+  rows: 6,
+  cols: 7,
   lastMove: null,
   board: [],
-  gameOver: false,
   showAnimations: true,
   difficulty: "hard",
-  p1Turn: true,
   p1Color: "red",
   p2Color: "yellow",
   p1Turns: 0,
-  p2Turns: 0
+  p2Turns: 0,
+  turns: this.p1Turns + this.p2Turns
 }
 
 
 function createButtons() {
-  while (colDiv.childElementCount !== boardCol) {
+  while (colDiv.childElementCount !== game.cols) {
     let i = colDiv.childElementCount;
-    if (i > boardCol) {
+    if (i > game.cols) {
       colDiv.lastChild.remove();
-    } else if (i < boardCol) {
+    } else if (i < game.cols) {
       colDiv.insertAdjacentHTML('beforeend', `<button type="button" name="col-${i + 1}" class="arrow" id="col-${i + 1}" value="${i + 1}"></button>`)
     } else {
       break;
@@ -173,7 +169,7 @@ function drop(col) {
         game.lastMove = [col, i];
         nextEmpty = i + 1;
         drawPiece(col, i + 1, color, ctx);
-        drawBoard(boardCol, boardRow, ctx);
+        drawBoard(game.cols, game.rows, ctx);
         if (winCheck(col, i, color, game.board)) {
           win()
         } else {
@@ -190,10 +186,10 @@ function animatePiece(col, y, color, nextEmpty) {
   setTimeout(function(){
     let speed = 1/5;
     y = Math.floor(y*100)/100;
-    if(y <= boardRow && y <= nextEmpty) {
+    if(y <= game.rows && y <= nextEmpty) {
       undrawPiece(col, y - speed, ctx)
       drawPiece(col, y, color, ctx);
-      drawBoard(boardCol, boardRow, ctx);
+      drawBoard(game.cols, game.rows, ctx);
       window.requestAnimationFrame(()=>{animatePiece(col, y + speed, color, nextEmpty)});
     } else {
       if (winCheck(col, nextEmpty - 1, color, game.board)) {
@@ -208,19 +204,19 @@ function animatePiece(col, y, color, nextEmpty) {
 
 function menuAnimation() {
   board2 = [];
-  for (let c = 0; c < boardCol; c++) {
+  for (let c = 0; c < game.cols; c++) {
     board2[c] = [];
-    for (let r = 0; r < boardRow; r++) {
+    for (let r = 0; r < game.rows; r++) {
       board2[c][r] = VACANT;
     }
   }
   ctx2.clearRect(0, 0, cvs2.width * 5, cvs2.height * 5);
-  menuDrawBoard(boardCol, boardRow, ctx2);
+  menuDrawBoard(game.cols, game.rows, ctx2);
   menuDrop()
 }
 
 function menuDrop() {
-  let col = Math.floor(Math.random() * boardCol);
+  let col = Math.floor(Math.random() * game.cols);
   let nextEmpty;
   let color;
   if (menuP1Turn === true) {
@@ -242,10 +238,10 @@ function menuAnimatePiece(col, y, color, nextEmpty) {
   setTimeout(function(){
     let speed = 1/10;
     y = Math.floor(y*100)/100;
-    if(y <= boardRow && y <= nextEmpty) {
+    if(y <= game.rows && y <= nextEmpty) {
       undrawPiece(col, y - speed, ctx2)
       drawPiece(col, y, color, ctx2);
-      menuDrawBoard(boardCol, boardRow, ctx2);
+      menuDrawBoard(game.cols, game.rows, ctx2);
       window.requestAnimationFrame(()=>{menuAnimatePiece(col, y + speed, color, nextEmpty)});
     } else {
           menuNextTurn();
@@ -303,19 +299,20 @@ function computerTurn(difficulty) {
 
 
   if (difficulty === "hard") {
-    // TODO: need to look forward for winning plays, and losing plays, weigh them against eachother
-    // heuristic function for non winning plays
-    //
-    // pruningAlgo()
     functionCalls = 0;
-    slot = pruningAlgo(JSON.parse(JSON.stringify(game.board)));
+    slot = pruningAlgo(JSON.parse(JSON.stringify(game.board))
+  );
     console.log("algo result: "+ slot)
-    slot = slot[0];
+    slot = slot[0] + 1;
     console.log("function calls: " + functionCalls);
 
 
 
   } else if (difficulty === "medium") {
+
+    slot = negamax(game.board, 0)
+    console.log(slot)
+
   } else if (difficulty === "easy") {
   } else {
     //random
@@ -329,23 +326,24 @@ function computerTurn(difficulty) {
   drop(slot);
 }
 
-function pruningAlgo(gameBoard, depth = 0,
-                    alpha = Number.NEGATIVE_INFINITY,
-                    beta = Number.POSITIVE_INFINITY,
-                    maxPlayer = true,
-                    lastMove = false) {
-  functionCalls++
-  // gameBoard = JSON.parse(JSON.stringify(gameBoard));
+function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, beta = Number.POSITIVE_INFINITY, maxPlayer = true, lastMove = false) {
+
+  // get deep copy of nested array (need to replace array later because this is slow)
+  gameBoard = JSON.parse(JSON.stringify(gameBoard));
+
+  // find all playable columns and add to possible move list and note what row is the next empty row
   let nextEmpty = [];
-  let possibleMoves = []
+  let possibleMoves = [];
   gameBoard.forEach((col, i) => {
       nextEmpty[i] = col.lastIndexOf(VACANT);
-      if (nextEmpty[i] > 0) {
+      if (nextEmpty[i] >= 0) {
         possibleMoves.push(i)
       }
   });
-  possibleMoves = possibleMoves.sort((a, b) => 0.5 - Math.random());
 
+  possibleMoves = possibleMoves.sort((a, b) => 0.5 - Math.random()); // randomize order of columns for searching
+
+  // define who's turn it is and what color they are
   let maxColor;
   let minColor;
   // if (p1Turn) {
@@ -356,75 +354,48 @@ function pruningAlgo(gameBoard, depth = 0,
     minColor = p1Color;
   // }
 
-  let gameEnd;
-  if (lastMove) {
+
+  if (depth === searchDepth || lastMove) {
     if (winCheck(lastMove[0], lastMove[1], maxColor, gameBoard)) {
-      gameEnd = 1;
+      return [false, (22 - ( game.p2Turns + depth))];
     } else if (winCheck(lastMove[0], lastMove[1], minColor, gameBoard)) {
-      gameEnd = 2;
+      return [false, (-1 * (22 - ( game.p2Turns + depth)))];
     } else if(possibleMoves.length === 0) {
-      gameEnd = 3;
-    } else {
-      gameEnd = false;
-    }
-  }
-
-
-
-  if (depth === searchDepth || gameEnd) {
-    if (gameEnd === 1) {
-      return [false, 22 - ( game.p2Turns + depth)];
-    } else if(gameEnd === 2) {
-      return [false, -1 * (22 - ( game.p2Turns + depth))];
-    } else if(gameEnd === 3) {
       return [false, 0];
-    } else if(game.p2Turns + depth % 2 == 0) {
-      return [false, Number.POSITIVE_INFINITY];
     } else {
-      return [false, Number.NEGATIVE_INFINITY];
+      return [false, 0];
     }
   }
 
-  let eval;
   let move;
   if (maxPlayer) {
-    let maxEval = Number.NEGATIVE_INFINITY;
+    let maxVal = Number.NEGATIVE_INFINITY;
     for (var i = 0; i < possibleMoves.length; i++) {
       move = possibleMoves[i];
       gameBoard[move][nextEmpty[move]] = maxColor;
-      eval = pruningAlgo(gameBoard, depth + 1, alpha, beta, false, [move, nextEmpty[move]])[1];
-      maxEval = Math.max(maxEval, eval);
-      alpha = Math.max(alpha, eval);
+      maxVal = Math.max(maxVal, pruningAlgo(gameBoard, depth + 1, alpha, beta, false, [move, nextEmpty[move]])[1]);
       gameBoard[move][nextEmpty[move]] = VACANT;
-      if (beta <= alpha) {
-        // console.log('Prune', alpha, beta);
+      if (maxVal >= beta) { // pruning unimportant nodes
         break;
       }
-      // if (maxEval > 0) {
-      //   console.log('Max: ', depth, [move, nextEmpty[move]], eval, maxEval);
-      // }
-
+      alpha = Math.max(alpha, maxVal);
     }
-    return [move, maxEval];
+    return [move, maxVal];
+
   } else {
-    let minEval = Number.POSITIVE_INFINITY;
+    let minVal = Number.POSITIVE_INFINITY;
     for (var i = 0; i < possibleMoves.length; i++) {
       move = possibleMoves[i];
       gameBoard[move][nextEmpty[move]] = minColor;
-      eval = pruningAlgo(gameBoard, depth + 1, alpha, beta, true, [move, nextEmpty[move]])[1];
-      minEval = Math.min(minEval, eval);
-      beta = Math.min(beta, eval);
+      minVal = Math.min(minVal, pruningAlgo(gameBoard, depth + 1, alpha, beta, true, [move, nextEmpty[move]])[1]);
       gameBoard[move][nextEmpty[move]] = VACANT;
-      if (beta <= alpha) {
-        // console.log('Prune', alpha, beta);
+      if (minVal <= alpha) { // pruning unimportant nodes
         break;
       }
-      // if (minEval > 0) {
-      //   console.log('Min: ', depth, [move, nextEmpty[move]], eval, minEval);
-      // }
+      beta = Math.min(beta, minVal);
 
     }
-    return [move, minEval];
+    return [move, minVal];
   }
 }
 
@@ -444,6 +415,17 @@ function boardConverter(board) {
     stringBoard[r] = string;
   }
   return stringBoard
+}
+
+function logBoardReverse(board) {
+  let newBoard = [];
+  for (var i = 0; i < board[0].length; i++) {
+    newBoard[i] = []
+    for (var j = 0; j < board.length; j++) {
+      newBoard[i][j] = board[j][i];
+    }
+  }
+  console.table(newBoard);
 }
 
 function boardReverter(stringBoard) {
@@ -469,7 +451,7 @@ function boardReverter(stringBoard) {
   //horizontal
   let consecutive = 0;
   let startC = (col - 3 >= 0) ? col - 3 : 0 ;
-  let endC = (col + 3 < boardCol) ? col + 4 : boardCol ;
+  let endC = (col + 3 < game.cols) ? col + 4 : game.cols ;
   if (endC - startC >= 3) {
     for (let i = startC; i < endC; i++) {
       if (board[i][row] == color) {
@@ -488,7 +470,7 @@ function boardReverter(stringBoard) {
   //vertical
   consecutive = 0;
   let startR = (row - 3 >= 0) ? row - 3 : 0 ;
-  let endR = (row + 3 < boardRow) ? row + 4 : boardRow ;
+  let endR = (row + 3 < game.rows) ? row + 4 : game.rows ;
   if (endR - startR >= 3) {
     for (let i = startR; i < endR; i++) {
       if (board[col][i] == color) {
@@ -508,7 +490,7 @@ function boardReverter(stringBoard) {
   consecutive = 0;
   let delta = 3
   for (var i = -delta; i <= delta; i++) {
-    if (col + i < 0 || col + i >= boardCol || row + i < 0 || row + i >= boardRow) {
+    if (col + i < 0 || col + i >= game.cols || row + i < 0 || row + i >= game.rows) {
       continue;
     }
     if (board[col + i][row + i] == color) {
@@ -526,7 +508,7 @@ function boardReverter(stringBoard) {
   //diagonal win bottom left => top right
   consecutive = 0;
   for (var i = -delta; i <= delta; i++) {
-    if (col + i < 0 || col + i >= boardCol || row - i < 0 || row - i >= boardRow) {
+    if (col + i < 0 || col + i >= game.cols || row - i < 0 || row - i >= game.rows) {
       continue;
     }
     if (board[col + i][row - i] == color) {
@@ -580,16 +562,16 @@ function newGame(players) {
   }
 
   board = [];
-  for (let c = 0; c < boardCol; c++) {
+  for (let c = 0; c < game.cols; c++) {
     game.board[c] = [];
-    for (let r = 0; r < boardRow; r++) {
+    for (let r = 0; r < game.rows; r++) {
       game.board[c][r] = VACANT;
     }
   }
 
   createButtons();
   ctx.clearRect(0, 0, cvs.width, cvs.height);
-  drawBoard(boardCol, boardRow, ctx)
+  drawBoard(game.cols, game.rows, ctx)
 }
 
 function quit() {
@@ -681,9 +663,9 @@ colDiv.addEventListener("mouseout", event => {
 menuAnimation();
 
 // testing area
-// options.toggleAnimations()
+options.toggleAnimations()
 // gameSelect.show();
-// newGame(1);
+newGame(1);
 // game.board[0][5] = "yellow"
 // game.board[1][5] = "yellow"
 // game.board[2][5] = "yellow"
