@@ -27,6 +27,9 @@ let showAnimations = true;
 let difficulty = "hard"
 let functionCalls = 0;
 let searchDepth = 8;
+let bestScore;
+let bestPath;
+let path
 
 let game = {
   rows: 6,
@@ -300,8 +303,9 @@ function computerTurn(difficulty) {
 
   if (difficulty === "hard") {
     functionCalls = 0;
-    slot = pruningAlgo(JSON.parse(JSON.stringify(game.board))
-  );
+    bestScore = [0,0];
+    slot = pruningAlgo(JSON.parse(JSON.stringify(game.board)));
+    console.log(bestScore);
     console.log("algo result: "+ slot)
     slot = slot[0] + 1;
     console.log("function calls: " + functionCalls);
@@ -329,9 +333,7 @@ function computerTurn(difficulty) {
 function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, beta = Number.POSITIVE_INFINITY, maxPlayer = true, lastMove = false) {
 
   functionCalls++
-
-  // get deep copy of nested array (need to replace array later because this is slow)
-  gameBoard = JSON.parse(JSON.stringify(gameBoard));
+  gameBoard = JSON.parse(JSON.stringify(gameBoard)); // get deep copy of nested array (need to replace array later because this is slow)
 
   // find all playable columns and add to possible move list and note what row is the next empty row
   let nextEmpty = [];
@@ -356,12 +358,20 @@ function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, bet
     minColor = p1Color;
   // }
 
-
-  if (depth === searchDepth || lastMove) {
+  // check for win/tie condition or for max search depth
+  if (lastMove) {
+    let score = (22 - (game.p2Turns + depth));
     if (winCheck(lastMove[0], lastMove[1], maxColor, gameBoard)) {
-      return [false, (22 - ( game.p2Turns + depth))];
+      if (score > bestScore[0]) {
+        bestScore[0] = score;
+        bestPath = path;
+      }
+      return [false, score];
     } else if (winCheck(lastMove[0], lastMove[1], minColor, gameBoard)) {
-      return [false, (-1 * (22 - ( game.p2Turns + depth)))];
+      if (-score < bestScore[1]) {
+        bestScore[1] = -score;
+      }
+      return [false, -score];
     } else if(possibleMoves.length === 0) {
       return [false, 0];
     } else if(depth === searchDepth){
@@ -369,19 +379,29 @@ function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, bet
     }
   }
 
+
   let move;
   if (maxPlayer) {
     let maxVal = Number.NEGATIVE_INFINITY;
     for (var i = 0; i < possibleMoves.length; i++) {
       move = possibleMoves[i];
+      if (depth === 0) {
+        path = move;
+        console.log('path ' + i + ": " + path)
+      }
       gameBoard[move][nextEmpty[move]] = maxColor;
       maxVal = Math.max(maxVal, pruningAlgo(gameBoard, depth + 1, alpha, beta, false, [move, nextEmpty[move]])[1]);
       gameBoard[move][nextEmpty[move]] = VACANT;
+      alpha = Math.max(alpha, maxVal);
       if (maxVal >= beta) { // pruning unimportant nodes
         break;
       }
-      alpha = Math.max(alpha, maxVal);
     }
+
+    if (depth === 0) {
+      return [bestPath, bestScore[0]];
+    }
+
     return [move, maxVal];
 
   } else {
@@ -391,11 +411,10 @@ function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, bet
       gameBoard[move][nextEmpty[move]] = minColor;
       minVal = Math.min(minVal, pruningAlgo(gameBoard, depth + 1, alpha, beta, true, [move, nextEmpty[move]])[1]);
       gameBoard[move][nextEmpty[move]] = VACANT;
+      beta = Math.min(beta, minVal);
       if (minVal <= alpha) { // pruning unimportant nodes
         break;
       }
-      beta = Math.min(beta, minVal);
-
     }
     return [move, minVal];
   }
@@ -663,14 +682,14 @@ colDiv.addEventListener("mouseout", event => {
 
 //Run Title Screen Animation
 menuAnimation();
-
-// testing area
-options.toggleAnimations()
+//
+// // testing area
+// options.toggleAnimations()
 // gameSelect.show();
-newGame(1);
-// game.board[0][5] = "yellow"
+// newGame(1);
 // game.board[1][5] = "yellow"
 // game.board[2][5] = "yellow"
+// game.board[3][5] = "yellow"
 // let functionCalls = 0;
 // console.log(pruningAlgo(JSON.parse(JSON.stringify(game.board)), 3, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, true))
 // console.log("function calls: " + functionCalls)
