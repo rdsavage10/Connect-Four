@@ -145,6 +145,7 @@ function drawPreview(x) {
 }
 
 function drop(col) {
+  debugger
   col--
   let nextEmpty;
   let color;
@@ -305,17 +306,16 @@ function computerTurn(difficulty) {
     functionCalls = 0;
     bestScore = [0,0];
     slot = pruningAlgo(JSON.parse(JSON.stringify(game.board)));
-    console.log(bestScore);
-    console.log("algo result: "+ slot)
+    // console.log(bestScore);
+    // console.log("algo result: "+ slot)
     slot = slot[0] + 1;
-    console.log("function calls: " + functionCalls);
+    // console.log("function calls: " + functionCalls);
 
 
 
   } else if (difficulty === "medium") {
 
     slot = negamax(game.board, 0)
-    console.log(slot)
 
   } else if (difficulty === "easy") {
   } else {
@@ -387,7 +387,7 @@ function pruningAlgo(gameBoard, depth = 0, alpha = Number.NEGATIVE_INFINITY, bet
       move = possibleMoves[i];
       if (depth === 0) {
         path = move;
-        console.log('path ' + i + ": " + path)
+        // console.log('path ' + i + ": " + path)
       }
       gameBoard[move][nextEmpty[move]] = maxColor;
       maxVal = Math.max(maxVal, pruningAlgo(gameBoard, depth + 1, alpha, beta, false, [move, nextEmpty[move]])[1]);
